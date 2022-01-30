@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Param, Pos
 import { CreateProductDTO } from './dto/create-product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
+import { Product } from './schemas/product.schema';
 
 @Controller('products')
 export class ProductsController {
@@ -10,7 +11,7 @@ export class ProductsController {
 
     @Get()
     // @Redirect('https://google.com', 301) // making redirect
-    getAll() {
+    getAll(): Promise<Product[]> {
         return this.productsService.getAll()
     }
 
@@ -20,24 +21,24 @@ export class ProductsController {
     // }
 
     @Get(':id')
-    getOneId(@Param('id') id: string) {
+    getOneId(@Param('id') id: string): Promise<Product> {
         return this.productsService.getById(id)
     }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
     // @Header('Cache-Control', 'none')
-    create(@Body() product: CreateProductDTO) {
+    create(@Body() product: CreateProductDTO): Promise<Product> {
         return this.productsService.create(product)
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string): string {
-        return `Removed ${id}`
+    remove(@Param('id') id: string): Promise<Product> {
+        return this.productsService.remove(id)
     }
 
     @Put(':id')
-    update(@Body() product: UpdateProductDTO, @Param('id') id: string): string {
-        return `Updated ${id}: Title: ${product.title}, Price: ${product.price}`
+    update(@Body() product: UpdateProductDTO, @Param('id') id: string): Promise<Product> {
+        return this.productsService.update(id, product)
     }
 }
